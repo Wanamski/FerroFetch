@@ -1,8 +1,8 @@
-## FerroFetch
+# FerroFetch
 
 A take on writing the well-known Neofetch program in Rust.
 
-# Note
+## Note
 
 This is a student's project for learning the programming language Rust.
 It will not run perfectly and there will be some errors. 
