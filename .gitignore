@@ -21,3 +21,4 @@ target/
 #.idea/
 
 .vscode
+config_testing

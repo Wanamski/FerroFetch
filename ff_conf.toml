@@ -1,0 +1,32 @@
+# template for the ferrofetch configuration file 
+
+# information to be printed on execution
+[print_info]
+os = true
+#host = true
+#kernel = true
+#uptime = true
+#packages = true
+#shell = true
+#resolution = true
+#de = true
+#wm = true
+#wm_theme = true
+#theme = true
+#icons = true
+#terminal = true
+#terminal_Font = true
+#cpu = true
+#gpu = true
+#memory = true
+
+#gpu_driver = false
+#cpu_usage = false
+#disk = false
+#battery = false
+#font = false
+#song = false
+#local_ip = false
+#public_ip = false
+#users = false
+#locale = false
