@@ -1,5 +1,5 @@
 use serde_derive::Deserialize;
-use std::{fs::File, io::Read, process::exit};
+use std::{fs, fs::File, io::Read, process::exit};
 use toml;
 
 #[derive(Deserialize)]
@@ -30,4 +30,35 @@ fn main() {
     };
 
     println!("OS in config set: {}", conf_data.print_info.os);
+}
+
+fn cpu_model() {
+    let cpu_data = fs::read_to_string("/proc/cpuinfo")
+        .expect("No Information about the cpu could be retrievet");
+
+    // 18 unnötige Zeichen
+    for line in cpu_data.lines() {
+        if line.contains("model name") {
+            let cpu_data = line;
+            let mut parts = cpu_data.split(": ");
+            println!("{}", parts.next().unwrap());
+            break;
+        }
+    }
+}
+
+fn cpu_max_speed() {
+    // Saves the content, the CPU clock speed in Hz, of the cpuinfo_max_freq file as String
+    let cpu_speed = fs::read_to_string("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq")
+        .expect("No Data were fond");
+
+    // Casts the value from String to float 64 Bit
+    let cpu_speed: f64 = match cpu_speed.trim().parse() {
+        Ok(num) => num,
+        Err(_) => 42.0,
+    };
+
+    let cpu_speed = (cpu_speed / 1000.0) / 1000.0;
+
+    println!("{cpu_speed} GHz")
 }
