@@ -1,5 +1,9 @@
 use serde_derive::Deserialize;
-use std::{fs, fs::File, io::Read, process::exit};
+use std::{
+    fs::{self, File},
+    io::Read,
+    process::exit,
+};
 use toml;
 
 #[derive(Deserialize)]
@@ -28,23 +32,59 @@ fn main() {
             exit(1);
         }
     };
-    cpu_model_and_cores();
+
+    let cpu_data = fs::read_to_string("/proc/cpuinfo")
+        .expect("No Information about the CPU could be retrievet");
+
+    os_name_and_architecture();
+    cpu_model(&cpu_data);
+    cpu_cores(&cpu_data);
+    cpu_threads(&cpu_data);
     cpu_max_speed();
 
     println!("OS in config set: {}", conf_data.print_info.os);
 }
 
-fn cpu_model_and_cores() {
-    let cpu_data = fs::read_to_string("/proc/cpuinfo")
-        .expect("No Information about the cpu could be retrievet");
+fn os_name_and_architecture() {
+    let os_name =
+        fs::read_to_string("/etc/os-release").expect("No information about the OS could be found");
 
+    for line in os_name.lines() {
+        if line.contains("PRETTY_NAME") {
+            let os_name = line;
+            let mut parts = os_name.split("\"");
+            println!("OS: {}", parts.nth(1).unwrap());
+            break;
+        }
+    }
+}
+
+fn cpu_model(cpu_data: &String) {
     // 18 unnötige Zeichen
     for line in cpu_data.lines() {
         if line.contains("model name") {
             let cpu_data = line;
             let mut parts = cpu_data.split(": ");
-            println!("CPU Model: {}", parts.nth(1).unwrap());
-        } else if line.contains("cpu cores") {
+            println!("CPU model: {}", parts.nth(1).unwrap());
+            break;
+        }
+    }
+}
+
+fn cpu_threads(cpu_data: &String) {
+    for line in cpu_data.lines() {
+        if line.contains("siblings") {
+            let cpu_data = line;
+            let mut parts = cpu_data.split(": ");
+            println!("CPU threads: {}", parts.nth(1).unwrap());
+            break;
+        }
+    }
+}
+
+fn cpu_cores(cpu_data: &String) {
+    for line in cpu_data.lines() {
+        if line.contains("cpu cores") {
             let cpu_data = line;
             let mut parts = cpu_data.split(": ");
             println!("CPU cores: {}", parts.nth(1).unwrap());
@@ -64,7 +104,7 @@ fn cpu_max_speed() {
         Err(_) => 42.0,
     };
 
-    let cpu_speed = (cpu_speed / 1000.0) / 1000.0;
+    let cpu_speed = cpu_speed / 1_000_000.0;
 
-    println!("{cpu_speed} GHz")
+    println!("CPU max speed: {cpu_speed} GHz")
 }
