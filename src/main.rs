@@ -28,11 +28,13 @@ fn main() {
             exit(1);
         }
     };
+    cpu_model_and_cores();
+    cpu_max_speed();
 
     println!("OS in config set: {}", conf_data.print_info.os);
 }
 
-fn cpu_model() {
+fn cpu_model_and_cores() {
     let cpu_data = fs::read_to_string("/proc/cpuinfo")
         .expect("No Information about the cpu could be retrievet");
 
@@ -41,7 +43,11 @@ fn cpu_model() {
         if line.contains("model name") {
             let cpu_data = line;
             let mut parts = cpu_data.split(": ");
-            println!("{}", parts.next().unwrap());
+            println!("CPU Model: {}", parts.nth(1).unwrap());
+        } else if line.contains("cpu cores") {
+            let cpu_data = line;
+            let mut parts = cpu_data.split(": ");
+            println!("CPU cores: {}", parts.nth(1).unwrap());
             break;
         }
     }
